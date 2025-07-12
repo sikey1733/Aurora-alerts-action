@@ -2,7 +2,7 @@ name: Run Space Weather Alert
 
 on:
   schedule:
-    - cron: '40 * * * *'   # на 40-й минуте каждого часа
+    - cron: '*/30 18-23 * * *'     # каждый 30 минут с 18:00 до 23:59
   workflow_dispatch:
 
 jobs:
@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      TZ: Europe/Moscow
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       R_LIBS_USER: ~/R/Library

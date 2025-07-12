@@ -42,7 +42,12 @@ jobs:
       run: mkdir -p ~/R/Library
 
     - name: Установка R пакетов
-      run: R -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos="https://cloud.r-project.org")'
+      run: |
+        mkdir -p ~/R/Library
+        export R_LIBS_USER=~/R/Library
+        R -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos="https://cloud.r-project.org")'
 
     - name: Запуск главного скрипта
-      run: Rscript scripts/main.R
+      run: |
+        export R_LIBS_USER=~/R/Library
+        Rscript scripts/main.R

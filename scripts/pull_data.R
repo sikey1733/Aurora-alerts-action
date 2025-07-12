@@ -43,8 +43,6 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   density_threshold <- 4
   bt_threshold <- 10
   
-  
-  
   # Прогноз сияний на основе данных NOAA
   # Условия для прогноза
   if (nrow(aurora_map) == 0) {
@@ -58,7 +56,6 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   } else {
     probability_NOAA <- "Не удалось однозначно определить состояние сияния!"
   }
-  
   
   # Прогноз сияний на основе данных спутника "DSCOVR" в точке лангража L1
   # Условия для прогноза
@@ -79,7 +76,6 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
     probability_DSCOVR <- "Вероятность полярного сияния низкая по текущим данным"
   }
   
-  
   # Сформированный текст сообщения с основными показателями
   msg <- paste0(
     "Самые свежие показания на сегодня:\n",
@@ -94,7 +90,6 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
     "\n Прогноз сияний на основе данных NOAA:\n", probability_NOAA, "\n",
     "\n Прогноз сияний на основе данных спутника DSCOVR: \n", probability_DSCOVR, "\n"
   )
-  
   
   # График солнечного потока за месяц (обновляемый)
   plot <- ggplot(data = flux_30d) +

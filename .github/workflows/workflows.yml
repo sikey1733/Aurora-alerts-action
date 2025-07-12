@@ -2,8 +2,8 @@ name: Run Space Weather Alert
 
 on:
   schedule:
-    - cron: '0 * * * *'   # каждый час
-    - cron: '40 * * * *'  # в 40-й минуте каждого часа
+    - cron: '0 * * * *'    # каждый час
+    - cron: '40 * * * *'   # на 40-й минуте каждого часа
   workflow_dispatch:
 
 jobs:
@@ -42,7 +42,10 @@ jobs:
     - name: Установка R пакетов
       run: |
         mkdir -p ~/R/Library
-        R -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos = "https://cloud.r-project.org")'
+        export R_LIBS_USER=~/R/Library
+        Rscript -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos = "https://cloud.r-project.org")'
 
     - name: Запуск главного скрипта
-      run: Rscript scripts/main.R
+      run: |
+        export R_LIBS_USER=~/R/Library
+        Rscript scripts/main.R

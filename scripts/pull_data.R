@@ -125,4 +125,5 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   } else {
     message("Картинка не найдена: ", map_path)
   }
+  return(TRUE)
 }

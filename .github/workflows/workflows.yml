@@ -38,12 +38,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-r-
 
-    - name: Установка зависимостей
-      run: |
-        mkdir -p ~/R/Library
-        export R_LIBS_USER=~/R/Library
-        Rscript requirements.R
-
     - name: Запуск главного скрипта
       run: |
         Rscript scripts/main.R

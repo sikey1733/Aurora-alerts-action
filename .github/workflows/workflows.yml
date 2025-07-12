@@ -2,7 +2,6 @@ name: Run Space Weather Alert
 
 on:
   schedule:
-    - cron: '0 * * * *'    # каждый час
     - cron: '40 * * * *'   # на 40-й минуте каждого часа
   workflow_dispatch:
 

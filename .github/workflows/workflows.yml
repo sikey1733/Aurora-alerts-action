@@ -38,6 +38,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-r-
 
+    - name: Создать папку для пользовательских библиотек
+      run: mkdir -p ~/R/Library
+
+    - name: Установка R пакетов
+      run: R -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos="https://cloud.r-project.org")'
+
     - name: Запуск главного скрипта
-      run: |
-        Rscript scripts/main.R
+      run: Rscript scripts/main.R

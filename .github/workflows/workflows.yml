@@ -2,8 +2,9 @@ name: Run Space Weather Alert
 
 on:
   schedule:
-  - cron: '*/40 * * * *'  # запускать каждые 40 минут
-  workflow_dispatch:     
+    - cron: '0 * * * *'   # каждый час
+    - cron: '40 * * * *'  # в 40-й минуте каждого часа
+  workflow_dispatch:
 
 jobs:
   run-r-script:
@@ -14,17 +15,35 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
-    - name: Checkout repo
+    - name: Клонирование репозитория
       uses: actions/checkout@v3
 
-    - name: Set up R
+    - name: Установка R
       uses: r-lib/actions/setup-r@v2
 
-    - name: Install dependencies
+    - name: Установка системных библиотек
       run: |
-        R -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos="https://cloud.r-project.org")'
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential pkg-config \
+          libcurl4-openssl-dev libssl-dev libxml2-dev \
+          libudunits2-dev libgdal-dev libgeos-dev libproj-dev \
+          libfontconfig1-dev
 
-    - name: Run script
+    - name: Кэширование библиотек R
+      uses: actions/cache@v3
+      with:
+        path: ~/R/Library
+        key: ${{ runner.os }}-r-${{ hashFiles('**/*.R') }}
+        restore-keys: |
+          ${{ runner.os }}-r-
+
+    - name: Установка зависимостей
+      run: |
+        mkdir -p ~/R/Library
+        export R_LIBS_USER=~/R/Library
+        Rscript requirements.R
+
+    - name: Запуск главного скрипта
       run: |
         Rscript scripts/main.R
-

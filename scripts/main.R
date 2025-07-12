@@ -1,3 +1,8 @@
+# Загрузка библиотек
+library(httr)
+library(jsonlite)
+library(tidyverse)
+
 # Подключение  вспомогательных скриптов 
 source("scripts/get_space_weather_data.R")
 source("scripts/pull_data.R")

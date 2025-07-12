@@ -78,17 +78,16 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   
   # Сформированный текст сообщения с основными показателями
   msg <- paste0(
-    "Самые свежие показания на сегодня:\n",
-    "Компонент магнитного поля по оси Z: ", mag_5min$bz_num, " наноТесла\n",
-    "Уровень Bt: ", mag_5min$bt_num, " наноТесла\n",
-    "Плотность солнечного ветра: ", plasma_5min$density, " частиц/см³\n",
-    "Скорость солнечного ветра: ", plasma_5min$speed, " км/с\n",
-    "Температура протонов солнечного ветра: ", plasma_5min$temperature, " °C\n",
-    "Текущий Кр-индекс: ", kp_now$kp_index, "\n",
-    "Прогнозы: \n",
-    "Прогноз Кр-индекса: ", kp_forecast$kp_index, "\n",
-    "\n Прогноз сияний на основе данных NOAA:\n", probability_NOAA, "\n",
-    "\n Прогноз сияний на основе данных спутника DSCOVR: \n", probability_DSCOVR, "\n"
+  "*Самые свежие показания на сегодня:*\n",
+  "• *Bz* (магнитное поле по оси Z): `", mag_5min$bz_num, "` нТл\n",
+  "• *Bt* (уровень): `", mag_5min$bt_num, "` нТл\n",
+  "• *Плотность ветра:* `", plasma_5min$density, "` частиц/см³\n",
+  "• *Скорость ветра:* `", plasma_5min$speed, "` км/с\n",
+  "• *Температура:* `", plasma_5min$temperature, "` °C\n",
+  "• *Текущий Kp-индекс:* `", kp_now$kp_index, "`\n",
+  "• *Прогноз Kp:* `", kp_forecast$kp_index, "`\n\n",
+  "*Прогноз NOAA:*\n", probability_NOAA, "\n\n",
+  "*Прогноз DSCOVR:*\n", probability_DSCOVR
   )
   
   # График солнечного потока за месяц (обновляемый)

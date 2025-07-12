@@ -13,6 +13,7 @@ jobs:
     env:
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      R_LIBS_USER: ~/R/Library
 
     steps:
     - name: Клонирование репозитория
@@ -38,16 +39,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-r-
 
-    - name: Создание папки для пользовательских библиотек
-      run: mkdir -p ~/R/Library
-
     - name: Установка R пакетов
       run: |
         mkdir -p ~/R/Library
-        export R_LIBS_USER=~/R/Library
-        R -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos="https://cloud.r-project.org")'
+        R -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos = "https://cloud.r-project.org")'
 
     - name: Запуск главного скрипта
-      run: |
-        export R_LIBS_USER=~/R/Library
-        Rscript scripts/main.R
+      run: Rscript scripts/main.R

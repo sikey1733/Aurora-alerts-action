@@ -1,8 +1,3 @@
-library(httr)
-library(jsonlite)
-library(tidyverse)
-library(leaflet)
-
 # Функция загружает и преобразует данные космической погоды
 get_space_weather_data <- function() {
   

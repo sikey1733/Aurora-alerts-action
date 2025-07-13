@@ -47,7 +47,7 @@
 
 2.  **Клонируйте репозиторий**
 
--   git clone <https://github.com/your-username/aurora-alert-bot.git>
+-   git clone <https://github.com/sikey1733/aurora-alert-bot.git>
 
 3.  **Установите переменные окружения (например, через `.Renviron`):**
 

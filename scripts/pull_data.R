@@ -38,10 +38,11 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
     filter(lon >= 46 & lon <= 49, lat >= 54 & lat <= 57)
   
   # Пороговые значения для прогноза на основе данных спутника "DSCOVR"
-  bz_threshold <- -5
-  speed_threshold <- 400
-  density_threshold <- 4
+  bz_threshold <- -6
+  speed_threshold <- 550
+  density_threshold <- 12
   bt_threshold <- 10
+  kp_threshold <- 6.67
   
   # Прогноз сияний на основе данных NOAA
   # Условия для прогноза
@@ -60,21 +61,22 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   # Прогноз сияний на основе данных спутника "DSCOVR" в точке лангража L1
   # Условия для прогноза
   if (mag_5min$bz_num > 0) {
-    probability_DSCOVR <- "Низкая вероятность сияния — Bz положительный, магнитосфера не возмущена"
-  } else if (mag_5min$bz_num <= bz_threshold && 
-             plasma_5min$speed >= speed_threshold && 
-             plasma_5min$density >= density_threshold && 
-             mag_5min$bt_num >= bt_threshold) {
-    probability_DSCOVR <- "Высокая вероятность полярного сияния — сильный южный Bz, высокая скорость и плотность ветра"
-  } else if (mag_5min$bz_num <= bz_threshold && 
-             (plasma_5min$speed < speed_threshold || plasma_5min$density < density_threshold)) {
-    probability_DSCOVR <- "Средняя вероятность — есть южный Bz, но скорость или плотность ветра ниже порогов"
-  } else if (mag_5min$bz_num > bz_threshold && 
-             (plasma_5min$speed >= speed_threshold || plasma_5min$density >= density_threshold)) {
-    probability_DSCOVR <- "Низкая-умеренная вероятность — положительный Bz, но высокая скорость или плотность ветра"
+  probability_DSCOVR <- "🔵 Низкая вероятность сияния — Bz положительный, магнитосфера закрыта"
+  } else if (mag_5min$bz_num <= bz_threshold &&
+           plasma_5min$speed >= speed_threshold &&
+           plasma_5min$density >= density_threshold &&
+           mag_5min$bt_num >= bt_threshold &&
+           kp_now$kp_index >= kp_threshold) {
+  probability_DSCOVR <- "🟢 *Высокая вероятность полярного сияния в Чувашии* — сильный южный Bz, высокая скорость и плотность солнечного ветра, Kp ≥ 6.67"
+  } else if (mag_5min$bz_num <= bz_threshold &&
+           (plasma_5min$speed >= speed_threshold || plasma_5min$density >= density_threshold)) {
+  probability_DSCOVR <- "🟡 Средняя вероятность — есть южный Bz, но не все параметры превышают пороги"
   } else {
-    probability_DSCOVR <- "Вероятность полярного сияния низкая по текущим данным"
+  probability_DSCOVR <- "🔴 Вероятность сияния низкая — условия не соответствуют сильной геоактивности"
   }
+
+
+
   
   # Сформированный текст сообщения с основными показателями
   msg <- paste0(
@@ -87,7 +89,7 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   "• *Текущий Kp-индекс:* `", kp_now$kp_index, "`\n",
   "• *Прогноз Kp:* `", kp_forecast$kp_index, "`\n\n",
   "*Прогноз NOAA (на сутки вперёд):*\n", probability_NOAA, "\n\n",
-  "*Прогноз в реальном времени от спутника DSCOVR:*\n", probability_DSCOVR
+  "*Прогноз DSCOVR (реальное время):*\n", probability_DSCOVR
   )
   
   # График солнечного потока за месяц (обновляемый)

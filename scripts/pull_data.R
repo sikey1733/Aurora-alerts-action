@@ -80,14 +80,14 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   msg <- paste0(
   "*Самые свежая информация по сиянию на сегодня:*\n",
   "• *Bz* (магнитное поле по оси Z): `", mag_5min$bz_num, "` нТл\n",
-  "• *Bt* (уровень): `", mag_5min$bt_num, "` нТл\n",
+  "• *Bt* (сила магнитного поля): `", mag_5min$bt_num, "` нТл\n",
   "• *Плотность ветра:* `", plasma_5min$density, "` частиц/см³\n",
   "• *Скорость ветра:* `", plasma_5min$speed, "` км/с\n",
   "• *Температура:* `", plasma_5min$temperature, "` °C\n",
   "• *Текущий Kp-индекс:* `", kp_now$kp_index, "`\n",
   "• *Прогноз Kp:* `", kp_forecast$kp_index, "`\n\n",
-  "*Прогноз NOAA:*\n", probability_NOAA, "\n\n",
-  "*Прогноз DSCOVR:*\n", probability_DSCOVR
+  "*Прогноз NOAA (на сутки вперёд):*\n", probability_NOAA, "\n\n",
+  "*Прямые измерения от спутника DSCOVR:*\n", probability_DSCOVR
   )
   
   # График солнечного потока за месяц (обновляемый)

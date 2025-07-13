@@ -87,7 +87,7 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   "• *Текущий Kp-индекс:* `", kp_now$kp_index, "`\n",
   "• *Прогноз Kp:* `", kp_forecast$kp_index, "`\n\n",
   "*Прогноз NOAA (на сутки вперёд):*\n", probability_NOAA, "\n\n",
-  "*Прямые измерения от спутника DSCOVR:*\n", probability_DSCOVR
+  "*Прогноз в реальном времени от спутника DSCOVR:*\n", probability_DSCOVR
   )
   
   # График солнечного потока за месяц (обновляемый)

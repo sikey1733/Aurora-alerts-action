@@ -32,7 +32,7 @@ get_space_weather_data <- function() {
     colnames(mag) <- result$mag_5min[1, ]
     processed$mag_5min_df <- mag %>%
       mutate(
-        time_tag = as.POSIXct(time_tag, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
         bz_num = as.numeric(bz_gsm),
         bt_num = as.numeric(bt)
       ) %>% 
@@ -45,7 +45,7 @@ get_space_weather_data <- function() {
     colnames(plasma) <- result$plasma_5min[1, ]
     processed$plasma_5min_df <- plasma %>%
       mutate(
-        time_tag = as.POSIXct(time_tag, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
         density = as.numeric(density),
         speed = as.numeric(speed),
         temperature = as.numeric(temperature) - 273.15
@@ -59,7 +59,7 @@ get_space_weather_data <- function() {
     colnames(kp_now) <- result$kp_now[1, ]
     processed$kp_now_df <- kp_now %>%
       mutate(
-        time_tag = as.POSIXct(time_tag, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
         kp_index = as.numeric(Kp)
       ) %>% 
       select(kp_index, time_tag)
@@ -71,7 +71,7 @@ get_space_weather_data <- function() {
     colnames(forecast_kp) <- result$kp_forecast[1, ]
     processed$kp_forecast_df <- forecast_kp %>%
       mutate(
-        time_tag = as.POSIXct(time_tag, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
         kp_index = as.numeric(kp)
       ) %>% 
       select(time_tag, kp_index)
@@ -83,7 +83,7 @@ get_space_weather_data <- function() {
     colnames(flux) <- result$flux_30d[1, ]
     processed$flux_30d_df <- flux %>%
       mutate(
-        time_tag = as.POSIXct(time_tag, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
         flux = as.numeric(flux)
       ) %>% 
       select(time_tag, flux)

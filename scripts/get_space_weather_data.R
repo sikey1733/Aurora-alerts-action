@@ -28,8 +28,7 @@ get_space_weather_data <- function() {
   
   # Обработка магнитного поля
   if (!is.null(result$mag_5min)) {
-    mag <- as.data.frame(result$mag_5min[-1, ])
-    colnames(mag) <- result$mag_5min[1, ]
+    mag <- as.data.frame(result$mag_5min)
     processed$mag_5min_df <- mag %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
@@ -41,8 +40,7 @@ get_space_weather_data <- function() {
   
   # Обработка параметров солнечного ветра
   if (!is.null(result$plasma_5min)) {
-    plasma <- as.data.frame(result$plasma_5min[-1, ])
-    colnames(plasma) <- result$plasma_5min[1, ]
+    plasma <- as.data.frame(result$plasma_5min)
     processed$plasma_5min_df <- plasma %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
@@ -55,8 +53,7 @@ get_space_weather_data <- function() {
   
   # Обработка текущего Kp-индекса
   if (!is.null(result$kp_now)) {
-    kp_now <- as.data.frame(result$kp_now[-1, ])
-    colnames(kp_now) <- result$kp_now[1, ]
+    kp_now <- as.data.frame(result$kp_now)
     processed$kp_now_df <- kp_now %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
@@ -67,8 +64,7 @@ get_space_weather_data <- function() {
   
   # Обработка прогноза Kp-индекса
   if (!is.null(result$kp_forecast)) {
-    forecast_kp <- as.data.frame(result$kp_forecast[-1, ])
-    colnames(forecast_kp) <- result$kp_forecast[1, ]
+    forecast_kp <- as.data.frame(result$kp_forecast)
     processed$kp_forecast_df <- forecast_kp %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
@@ -79,8 +75,7 @@ get_space_weather_data <- function() {
   
   # Обработка солнечного радиопотока (10.7 см)
   if (!is.null(result$flux_30d)) {
-    flux <- as.data.frame(result$flux_30d[-1, ])
-    colnames(flux) <- result$flux_30d[1, ]
+    flux <- as.data.frame(result$flux_30d)
     processed$flux_30d_df <- flux %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),

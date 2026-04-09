@@ -114,8 +114,9 @@ get_space_weather_data <- function() {
       }
     )
   ) %>% 
-  select(time_tag, flux)
-  
+  select(time_tag, flux)    
+ }
+                              
   # Обработка координат сияния
   if (!is.null(result$aurora)) {
     aurora_coords <- as.data.frame(result$aurora$coordinates)

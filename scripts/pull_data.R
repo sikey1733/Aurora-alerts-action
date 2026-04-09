@@ -86,6 +86,9 @@ pull_data <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   )
 
   # Построение графика
+  flux_30d <- flux_30d %>%
+  filter(!is.na(time_tag), !is.na(flux))
+  
   plot <- ggplot(data = flux_30d) +
     geom_line(aes(x = time_tag, y = flux), color = "steelblue", na.rm = TRUE) +
     geom_smooth(aes(x = time_tag, y = flux), color = "darkred", se = FALSE) +

@@ -29,8 +29,11 @@ get_space_weather_data <- function() {
   # Обработка магнитного поля
   if (!is.null(result$mag_5min)) {
     mag <- as.data.frame(result$mag_5min)
+
+  if (!"time_tag" %in% colnames(mag)) {
     colnames(mag) <- mag[1, ]
     mag <- mag[-1, ]
+  }
     processed$mag_5min_df <- mag %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
@@ -43,8 +46,11 @@ get_space_weather_data <- function() {
   # Обработка параметров солнечного ветра
   if (!is.null(result$plasma_5min)) {
     plasma <- as.data.frame(result$plasma_5min)
-    colnames(plasma) <- plasma[1, ]
-    plasma <- plasma[-1, ]
+
+  if (!"time_tag" %in% colnames(plasma)) {
+  colnames(plasma) <- plasma[1, ]
+  plasma <- plasma[-1, ]
+  }
     processed$plasma_5min_df <- plasma %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
@@ -58,12 +64,15 @@ get_space_weather_data <- function() {
   # Обработка текущего Kp-индекса
   if (!is.null(result$kp_now)) {
     kp_now <- as.data.frame(result$kp_now)
+
+  if (!"time_tag" %in% colnames(kp_now)) {
     colnames(kp_now) <- kp_now[1, ]
     kp_now <- kp_now[-1, ]
+  }
     processed$kp_now_df <- kp_now %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
-        kp_index = as.numeric(Kp)
+        kp_index = as.numeric(if ("Kp" %in% colnames(kp_now)) Kp else kp)
       ) %>% 
       select(kp_index, time_tag)
   }
@@ -71,12 +80,15 @@ get_space_weather_data <- function() {
   # Обработка прогноза Kp-индекса
   if (!is.null(result$kp_forecast)) {
     forecast_kp <- as.data.frame(result$kp_forecast)
+
+  if (!"time_tag" %in% colnames(forecast_kp)) {
     colnames(forecast_kp) <- forecast_kp[1, ]
     forecast_kp <- forecast_kp[-1, ]
+  }
     processed$kp_forecast_df <- forecast_kp %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
-        kp_index = as.numeric(kp)
+        kp_index = as.numeric(if ("kp" %in% colnames(forecast_kp)) kp else Kp)
       ) %>% 
       select(time_tag, kp_index)
   }
@@ -84,12 +96,15 @@ get_space_weather_data <- function() {
   # Обработка солнечного радиопотока (10.7 см)
   if (!is.null(result$flux_30d)) {
     flux <- as.data.frame(result$flux_30d)
+
+  if (!"time_tag" %in% colnames(flux)) {
     colnames(flux) <- flux[1, ]
     flux <- flux[-1, ]
+  }
     processed$flux_30d_df <- flux %>%
       mutate(
         time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
-        flux = as.numeric(flux)
+        flux = as.numeric(if ("flux" %in% colnames(flux)) flux else `f10.7`)
       ) %>% 
       select(time_tag, flux)
   }

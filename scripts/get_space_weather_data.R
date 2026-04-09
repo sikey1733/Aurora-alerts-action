@@ -102,12 +102,19 @@ get_space_weather_data <- function() {
     flux <- flux[-1, ]
   }
     processed$flux_30d_df <- flux %>%
-      mutate(
-        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
-        flux = as.numeric(if ("flux" %in% colnames(flux)) flux else `f10.7`)
-      ) %>% 
-      select(time_tag, flux)
-  }
+  mutate(
+    time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+    flux = as.numeric(
+      if ("flux" %in% colnames(.)) {
+        .data[["flux"]]
+      } else if ("f10.7" %in% colnames(.)) {
+        .data[["f10.7"]]
+      } else {
+        NA
+      }
+    )
+  ) %>% 
+  select(time_tag, flux)
   
   # Обработка координат сияния
   if (!is.null(result$aurora)) {

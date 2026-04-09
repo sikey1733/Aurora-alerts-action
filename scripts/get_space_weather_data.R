@@ -36,7 +36,7 @@ get_space_weather_data <- function() {
   }
     processed$mag_5min_df <- mag %>%
       mutate(
-        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%dT%H:%M:%S", tz = "UTC"),
         bz_num = as.numeric(bz_gsm),
         bt_num = as.numeric(bt)
       ) %>% 
@@ -53,7 +53,7 @@ get_space_weather_data <- function() {
   }
     processed$plasma_5min_df <- plasma %>%
       mutate(
-        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%dT%H:%M:%S", tz = "UTC"),
         density = as.numeric(density),
         speed = as.numeric(speed),
         temperature = as.numeric(temperature) - 273.15
@@ -71,7 +71,7 @@ get_space_weather_data <- function() {
   }
     processed$kp_now_df <- kp_now %>%
       mutate(
-        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%dT%H:%M:%S", tz = "UTC"),
         kp_index = as.numeric(if ("Kp" %in% colnames(kp_now)) Kp else kp)
       ) %>% 
       select(kp_index, time_tag)
@@ -87,7 +87,7 @@ get_space_weather_data <- function() {
   }
     processed$kp_forecast_df <- forecast_kp %>%
       mutate(
-        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+        time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%dT%H:%M:%S", tz = "UTC"),
         kp_index = as.numeric(if ("kp" %in% colnames(forecast_kp)) kp else Kp)
       ) %>% 
       select(time_tag, kp_index)
@@ -103,7 +103,7 @@ get_space_weather_data <- function() {
   }
     processed$flux_30d_df <- flux %>%
   mutate(
-    time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+    time_tag = as.POSIXct(substr(time_tag, 1, 19), format = "%Y-%m-%dT%H:%M:%S", tz = "UTC"),
     flux = as.numeric(
       if ("flux" %in% colnames(.)) {
         .data[["flux"]]

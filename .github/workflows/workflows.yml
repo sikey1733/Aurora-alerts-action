@@ -2,7 +2,7 @@ name: Run Space Weather Alert
 
 on:
   schedule:
-    - cron: '*/30 13-20 * * *'     # каждый 30 минут с 16:00 до 23:59
+    - cron: '*/30 13-20 * * *'
   workflow_dispatch:
 
 jobs:
@@ -13,49 +13,48 @@ jobs:
       TZ: Europe/Moscow
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      R_LIBS_USER: ~/R/Library
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-    - name: Клонирование репозитория
-      uses: actions/checkout@v3
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
 
-    - name: Установка R
-      uses: r-lib/actions/setup-r@v2
+      - name: Установка R
+        uses: r-lib/actions/setup-r@v2
 
-    - name: 📦 Кэширование библиотек R
-      uses: actions/cache@v3
-      with:
-        path: ~/R/Library
-        key: ${{ runner.os }}-r-${{ hashFiles('**/*.R', '**/*.Rmd', '**/DESCRIPTION') }}
-        restore-keys: |
-          ${{ runner.os }}-r-
+      - name: Установка системных библиотек
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            pkg-config \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libxml2-dev \
+            libudunits2-dev \
+            libgdal-dev \
+            libgeos-dev \
+            libproj-dev \
+            libfontconfig1-dev \
+            libfreetype6-dev \
+            libharfbuzz-dev \
+            libfribidi-dev \
+            libpng-dev
 
-    - name: Установка системных библиотек
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential pkg-config \
-          libcurl4-openssl-dev libssl-dev libxml2-dev \
-          libudunits2-dev libgdal-dev libgeos-dev libproj-dev \
-          libfontconfig1-dev libfreetype6-dev libharfbuzz-dev \
-          libfribidi-dev libpng-dev
+      - name: Установка зависимостей R
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::httr
+            any::jsonlite
+            any::tidyverse
 
-    - name: Установка R пакетов
-      run: |
-        mkdir -p ~/R/Library
-        export R_LIBS_USER=~/R/Library
-        Rscript -e 'install.packages(c("httr", "jsonlite", "tidyverse"), repos = "https://cloud.r-project.org")'
-        Rscript -e 'library(httr); print("httr загружен успешно!")'
-        Rscript -e 'library(jsonlite); print("jsonlite загружен успешно!")'
-        Rscript -e 'library(tidyverse); print("tidyverse загружен успешно!")'
-        
-    - name: Проверка установленных пакетов
-      run: |
-          export R_LIBS_USER=~/R/Library
-          Rscript -e 'print(installed.packages()[, "Package"])'
-          
-    - name: Запуск главного скрипта
-      run: |
-        export R_LIBS_USER=~/R/Library
-        Rscript scripts/main.R
+      - name: Проверка пакетов
+        run: |
+          Rscript -e 'library(httr)'
+          Rscript -e 'library(jsonlite)'
+          Rscript -e 'library(tidyverse)'
+          Rscript -e 'print("Все пакеты успешно загружены!")'
+
+      - name: Запуск главного скрипта
+        run: |
+          Rscript scripts/main.R

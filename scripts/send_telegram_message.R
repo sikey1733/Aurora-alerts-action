@@ -6,14 +6,14 @@ send_telegram_message <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   
   # Выполняет POST-запрос с параметрами: chat_id, текст сообщения, форматирование Markdown
   tryCatch({
-    res <- POST(url, body = list(
+    res <- httr::POST(url, body = list(
       chat_id = chat_id,
       text = message_text,
       parse_mode = "Markdown"
     ), encode = "form")
     
     # Проверяет статус ответа
-    if (status_code(res) == 200) {
+    if (httr::status_code(res) == 200) {
       message("Сообщение успешно отправлено в Telegram.")
       return(TRUE)
     } else {

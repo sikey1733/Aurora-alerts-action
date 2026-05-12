@@ -18,7 +18,7 @@ send_telegram_image <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
       url,
       body = list(
         chat_id = chat_id,
-        photo = upload_file(image_path)
+        photo = httr::upload_file(image_path)
       ),
       encode = "multipart"
     )

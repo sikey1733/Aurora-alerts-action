@@ -51,7 +51,22 @@ jobs:
       - name: Установка пакетов R
         run: |
           Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org"))'
-          Rscript -e 'install.packages(c("rlang","ggplot2","dplyr","readr","httr","jsonlite"))'
+
+          Rscript -e 'install.packages(c(
+            "rlang",
+            "ggplot2",
+            "dplyr",
+            "readr",
+            "tidyr",
+            "stringr",
+            "purrr",
+            "lubridate",
+            "httr",
+            "jsonlite",
+            "sf",
+            "terra",
+            "ncdf4"
+          ))'
 
       - name: Проверка пакетов
         run: |
@@ -59,6 +74,14 @@ jobs:
           Rscript -e 'library(jsonlite)'
           Rscript -e 'library(ggplot2)'
           Rscript -e 'library(dplyr)'
+          Rscript -e 'library(readr)'
+          Rscript -e 'library(tidyr)'
+          Rscript -e 'library(stringr)'
+          Rscript -e 'library(purrr)'
+          Rscript -e 'library(lubridate)'
+          Rscript -e 'library(sf)'
+          Rscript -e 'library(terra)'
+          Rscript -e 'library(ncdf4)'
           Rscript -e 'print("Все пакеты успешно загружены!")'
 
       - name: Запуск главного скрипта

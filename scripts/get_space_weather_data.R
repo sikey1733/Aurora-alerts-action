@@ -17,7 +17,7 @@ get_space_weather_data <- function() {
   for (name in names(url)) {
     res <- GET(url[[name]])
     if (status_code(res) == 200) {
-      result[[name]] <- fromJSON(content(res, "text", encoding = "UTF-8"))
+      result[[name]] <- jsonlite::fromJSON(httr::content(res, "text", encoding = "UTF-8"))
     } else {
       warning(paste("Ошибка при запросе:", name))
       result[[name]] <- NULL

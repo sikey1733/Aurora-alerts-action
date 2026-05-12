@@ -20,6 +20,9 @@ jobs:
 
       - name: Установка R
         uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.1'
+          use-public-rspm: true
 
       - name: Установка системных библиотек
         run: |
@@ -40,19 +43,22 @@ jobs:
             libfribidi-dev \
             libpng-dev
 
-      - name: Установка зависимостей R
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          packages: |
-            any::httr
-            any::jsonlite
-            any::tidyverse
+      - name: Очистка возможного битого кэша
+        run: |
+          rm -rf ~/R/x86_64-pc-linux-gnu-library
+          rm -rf /home/runner/R/Library
+
+      - name: Установка пакетов R
+        run: |
+          Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org"))'
+          Rscript -e 'install.packages(c("rlang","ggplot2","dplyr","readr","httr","jsonlite"))'
 
       - name: Проверка пакетов
         run: |
           Rscript -e 'library(httr)'
           Rscript -e 'library(jsonlite)'
-          Rscript -e 'library(tidyverse)'
+          Rscript -e 'library(ggplot2)'
+          Rscript -e 'library(dplyr)'
           Rscript -e 'print("Все пакеты успешно загружены!")'
 
       - name: Запуск главного скрипта

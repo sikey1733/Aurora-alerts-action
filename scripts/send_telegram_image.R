@@ -14,7 +14,7 @@ send_telegram_image <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
   
   # Выполняет POST-запрос с загрузкой файла методом multipart/form-data
   tryCatch({
-    res <- POST(
+    res <- httr::POST(
       url,
       body = list(
         chat_id = chat_id,
@@ -24,7 +24,7 @@ send_telegram_image <- function(bot_token = Sys.getenv("TELEGRAM_TOKEN"),
     )
     
     # Проверяет статус ответа — 200 значит успешно
-    if (status_code(res) == 200) {
+    if (httr::status_code(res) == 200) {
       message("Изображение успешно отправлено в Telegram: ", basename(image_path))
       return(TRUE)
     } else {

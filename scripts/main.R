@@ -1,7 +1,10 @@
 # Запуск библиотек
-library(httr)
-library(jsonlite)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(tidyr)
+library(stringr)
+library(purrr)
 
 # Подключение  вспомогательных скриптов 
 source("scripts/get_space_weather_data.R")

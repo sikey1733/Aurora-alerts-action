@@ -43,16 +43,13 @@ jobs:
             libfribidi-dev \
             libpng-dev
 
-      - name: Очистка возможного битого кэша
+      - name: Установка pak
         run: |
-          rm -rf ~/R/x86_64-pc-linux-gnu-library
-          rm -rf /home/runner/R/Library
+          Rscript -e 'install.packages("pak", repos="https://cloud.r-project.org")'
 
       - name: Установка пакетов R
         run: |
-          Rscript -e 'options(repos = c(CRAN = "https://cloud.r-project.org"))'
-
-          Rscript -e 'install.packages(c(
+          Rscript -e 'pak::pkg_install(c(
             "rlang",
             "ggplot2",
             "dplyr",

@@ -1,58 +1,89 @@
-# Функция загружает и преобразует данные космической погоды
 get_space_weather_data <- function() {
 
-  # Список URL-адресов для загрузки JSON-данных
+  # URL источников данных NOAA
   url <- list(
-    mag_5min = "https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json",                  # Магнитное поле
-    kp_now = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json",          # Текущий Kp-индекс
-    kp_forecast = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json", # Прогноз Kp-индекса
-    flux_30d = "https://services.swpc.noaa.gov/products/10cm-flux-30-day.json",              # Поток радиоизлучения 10 см
-    plasma_5min = "https://services.swpc.noaa.gov/json/rtsw/rtsw_wind_1m.json",              # Параметры солнечного ветра
-    aurora = "https://services.swpc.noaa.gov/json/ovation_aurora_latest.json"                # Прогноз полярных сияний
+    mag_5min = "https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json",
+    kp_now = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json",
+    kp_forecast = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json",
+    flux_30d = "https://services.swpc.noaa.gov/products/10cm-flux-30-day.json",
+    plasma_5min = "https://services.swpc.noaa.gov/json/rtsw/rtsw_wind_1m.json",
+    aurora = "https://services.swpc.noaa.gov/json/ovation_aurora_latest.json"
   )
 
   result <- list()
 
-  # Запрос и загрузка JSON-данных
+  # Загрузка данных
   for (name in names(url)) {
+
     res <- tryCatch(
-      httr::GET(url[[name]], timeout(30)),
+      httr::GET(
+        url[[name]],
+        httr::timeout(30)
+      ),
       error = function(e) {
-        warning(paste("Ошибка запроса", name, ":", e$message))
-        NULL
+        warning(sprintf(
+          "Ошибка подключения %s: %s",
+          name,
+          e$message
+        ))
+        return(NULL)
       }
     )
 
-    if (!is.null(res) && httr::status_code(res) == 200) {
-      result[[name]] <- tryCatch(
-        jsonlite::fromJSON(
-          httr::content(res, "text", encoding = "UTF-8")
-        ),
-        error = function(e) {
-          warning(paste("Ошибка чтения JSON:", name))
-          NULL
-        }
-      )
-    } else {
-      warning(paste("Ошибка при запросе:", name))
+    if (is.null(res)) {
       result[[name]] <- NULL
+      next
     }
+
+    if (httr::status_code(res) != 200) {
+      warning(sprintf(
+        "HTTP ошибка %s: %s",
+        name,
+        httr::status_code(res)
+      ))
+      result[[name]] <- NULL
+      next
+    }
+
+    result[[name]] <- tryCatch(
+      jsonlite::fromJSON(
+        httr::content(
+          res,
+          as = "text",
+          encoding = "UTF-8"
+        ),
+        simplifyDataFrame = TRUE
+      ),
+      error = function(e) {
+        warning(sprintf(
+          "Ошибка чтения JSON %s: %s",
+          name,
+          e$message
+        ))
+        return(NULL)
+      }
+    )
   }
 
   processed <- list()
 
-  # ---------------------------------------------------------
-  # Обработка магнитного поля
-  # ---------------------------------------------------------
-  if (!is.null(result$mag_5min)) {
+  # ==========================================================
+  # Магнитное поле
+  # ==========================================================
+  if (!is.null(result$mag_5min) &&
+      nrow(result$mag_5min) > 0) {
 
     mag <- as.data.frame(result$mag_5min)
 
+    if ("active" %in% names(mag)) {
+      mag <- mag %>%
+        dplyr::filter(active == TRUE)
+    }
+
     processed$mag_5min_df <- mag %>%
-      dplyr::filter(active == TRUE) %>%
       dplyr::mutate(
         time_tag = as.POSIXct(
-          substr(time_tag, 1, 19),
+          time_tag,
           format = "%Y-%m-%dT%H:%M:%S",
           tz = "UTC"
         ),
@@ -66,18 +97,23 @@ get_space_weather_data <- function() {
       )
   }
 
-  # ---------------------------------------------------------
-  # Обработка параметров солнечного ветра
-  # ---------------------------------------------------------
-  if (!is.null(result$plasma_5min)) {
+  # ==========================================================
+  # Солнечный ветер
+  # ==========================================================
+  if (!is.null(result$plasma_5min) &&
+      nrow(result$plasma_5min) > 0) {
 
     plasma <- as.data.frame(result$plasma_5min)
 
+    if ("active" %in% names(plasma)) {
+      plasma <- plasma %>%
+        dplyr::filter(active == TRUE)
+    }
+
     processed$plasma_5min_df <- plasma %>%
-      dplyr::filter(active == TRUE) %>%
       dplyr::mutate(
         time_tag = as.POSIXct(
-          substr(time_tag, 1, 19),
+          time_tag,
           format = "%Y-%m-%dT%H:%M:%S",
           tz = "UTC"
         ),
@@ -93,9 +129,9 @@ get_space_weather_data <- function() {
       )
   }
 
-  # ---------------------------------------------------------
-  # Обработка текущего Kp-индекса
-  # ---------------------------------------------------------
+  # ==========================================================
+  # Текущий Kp
+  # ==========================================================
   if (!is.null(result$kp_now)) {
 
     kp_now <- as.data.frame(result$kp_now)
@@ -122,9 +158,9 @@ get_space_weather_data <- function() {
       )
   }
 
-  # ---------------------------------------------------------
-  # Обработка прогноза Kp
-  # ---------------------------------------------------------
+  # ==========================================================
+  # Прогноз Kp
+  # ==========================================================
   if (!is.null(result$kp_forecast)) {
 
     forecast_kp <- as.data.frame(result$kp_forecast)
@@ -151,9 +187,9 @@ get_space_weather_data <- function() {
       )
   }
 
-  # ---------------------------------------------------------
-  # Обработка солнечного радиопотока
-  # ---------------------------------------------------------
+  # ==========================================================
+  # Поток F10.7
+  # ==========================================================
   if (!is.null(result$flux_30d)) {
 
     flux <- as.data.frame(result$flux_30d)
@@ -171,9 +207,9 @@ get_space_weather_data <- function() {
           tz = "UTC"
         ),
         flux = as.numeric(
-          if ("flux" %in% colnames(.)) {
+          if ("flux" %in% names(.)) {
             .data[["flux"]]
-          } else if ("f10.7" %in% colnames(.)) {
+          } else if ("f10.7" %in% names(.)) {
             .data[["f10.7"]]
           } else {
             NA
@@ -186,22 +222,32 @@ get_space_weather_data <- function() {
       )
   }
 
-  # ---------------------------------------------------------
-  # Обработка координат полярного сияния
-  # ---------------------------------------------------------
-  if (!is.null(result$aurora)) {
+  # ==========================================================
+  # Карта сияний
+  # ==========================================================
+  if (!is.null(result$aurora) &&
+      "coordinates" %in% names(result$aurora)) {
 
     aurora_coords <- as.data.frame(
       result$aurora$coordinates
     )
 
-    colnames(aurora_coords) <- c(
-      "lon",
-      "lat",
-      "aurora"
-    )
+    if (ncol(aurora_coords) >= 3) {
+      colnames(aurora_coords)[1:3] <- c(
+        "lon",
+        "lat",
+        "aurora"
+      )
 
-    processed$aurora_map_df <- aurora_coords
+      processed$aurora_map_df <- aurora_coords
+    }
+  }
+
+  cat("\nУспешно загружены:\n")
+  print(names(processed))
+
+  if (!is.null(warnings())) {
+    print(warnings())
   }
 
   return(processed)

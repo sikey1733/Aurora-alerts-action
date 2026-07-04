@@ -17,7 +17,10 @@ get_space_weather_data <- function() {
   for (name in names(url)) {
     res <- tryCatch(
       httr::GET(url[[name]], timeout(30)),
-      error = function(e) NULL
+      error = function(e) {
+        warning(paste("Ошибка запроса", name, ":", e$message))
+        NULL
+      }
     )
 
     if (!is.null(res) && httr::status_code(res) == 200) {

@@ -252,8 +252,8 @@ get_space_weather_data <- function() {
       processed$aurora_map_df <- aurora_coords
 
       # Координаты центра Чувашии
-      chuv_lon <- 47.2489
-      chuv_lat <- 56.1439
+      chuv_lon <- 47.20
+      chuv_lat <- 55.50
 
       chuvashia_aurora <- aurora_coords %>%
         dplyr::mutate(

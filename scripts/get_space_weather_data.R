@@ -12,7 +12,9 @@ get_space_weather_data <- function() {
 
   result <- list()
 
+  # ==========================================================
   # Загрузка данных
+  # ==========================================================
   for (name in names(url)) {
 
     res <- tryCatch(
@@ -145,7 +147,7 @@ get_space_weather_data <- function() {
       dplyr::mutate(
         time_tag = as.POSIXct(
           substr(time_tag, 1, 19),
-          format = "%Y-%m-%dT%H:%M:%S",
+          format = "%Y-%m-%d %H:%M:%S",
           tz = "UTC"
         ),
         kp_index = as.numeric(
@@ -153,8 +155,8 @@ get_space_weather_data <- function() {
         )
       ) %>%
       dplyr::select(
-        kp_index,
-        time_tag
+        time_tag,
+        kp_index
       )
   }
 
@@ -172,10 +174,11 @@ get_space_weather_data <- function() {
 
     processed$kp_forecast_df <- forecast_kp %>%
       dplyr::mutate(
-        time_tag = as.POSIXct(
-          substr(time_tag, 1, 19),
-          format = "%Y-%m-%dT%H:%M:%S",
-          tz = "UTC"
+        time_tag = suppressWarnings(
+          as.POSIXct(
+            substr(time_tag, 1, 19),
+            tz = "UTC"
+          )
         ),
         kp_index = as.numeric(
           if ("kp" %in% colnames(forecast_kp)) kp else Kp
@@ -201,10 +204,11 @@ get_space_weather_data <- function() {
 
     processed$flux_30d_df <- flux %>%
       dplyr::mutate(
-        time_tag = as.POSIXct(
-          substr(time_tag, 1, 19),
-          format = "%Y-%m-%dT%H:%M:%S",
-          tz = "UTC"
+        time_tag = suppressWarnings(
+          as.POSIXct(
+            substr(time_tag, 1, 19),
+            tz = "UTC"
+          )
         ),
         flux = as.numeric(
           if ("flux" %in% names(.)) {
@@ -223,7 +227,7 @@ get_space_weather_data <- function() {
   }
 
   # ==========================================================
-  # Карта сияний
+  # Карта сияний и прогноз для Чувашии
   # ==========================================================
   if (!is.null(result$aurora) &&
       "coordinates" %in% names(result$aurora)) {
@@ -232,21 +236,50 @@ get_space_weather_data <- function() {
       result$aurora$coordinates
     )
 
-    if (ncol(aurora_coords) >= 3) {
+    if (ncol(aurora_coords) >= 3 &&
+        nrow(aurora_coords) > 0) {
+
       colnames(aurora_coords)[1:3] <- c(
         "lon",
         "lat",
         "aurora"
       )
 
+      aurora_coords$lon <- as.numeric(aurora_coords$lon)
+      aurora_coords$lat <- as.numeric(aurora_coords$lat)
+      aurora_coords$aurora <- as.numeric(aurora_coords$aurora)
+
       processed$aurora_map_df <- aurora_coords
+
+      # Координаты центра Чувашии
+      chuv_lon <- 47.2489
+      chuv_lat <- 56.1439
+
+      chuvashia_aurora <- aurora_coords %>%
+        dplyr::mutate(
+          distance = sqrt(
+            (lon - chuv_lon)^2 +
+            (lat - chuv_lat)^2
+          )
+        ) %>%
+        dplyr::arrange(distance) %>%
+        dplyr::slice(1)
+
+      processed$aurora_chuvashia_df <- chuvashia_aurora
+
+      cat(
+        sprintf(
+          "\nВероятность полярного сияния для Чувашии: %.0f%%\n",
+          chuvashia_aurora$aurora
+        )
+      )
     }
   }
 
-  cat("\nУспешно загружены:\n")
+  cat("\nУспешно загружены наборы данных:\n")
   print(names(processed))
 
-  if (!is.null(warnings())) {
+  if (length(warnings()) > 0) {
     print(warnings())
   }
 
